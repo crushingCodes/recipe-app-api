@@ -10,4 +10,4 @@ class CalcTests(TestCase):
         self.assertEqual(add(3, 8), 11)
 
     def test_subtract_numbers(self):
-        self.assertEqual(subtract(11,3),8)
+        self.assertEqual(subtract(11, 3), 8)
