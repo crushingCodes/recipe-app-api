@@ -1,5 +1,5 @@
-README
+# Recipe App Api
 
-To run things inside docker
+To run commands inside docker
 
 `docker-compose run app sh -c ""`
