@@ -44,13 +44,14 @@ class PublicUserAPITests(TestCase):
     def test_password_too_short(self):
         """Password must be more then 5 characters"""
         payload = {
-            "email": "test2@email.com",
-            "password": " pass1"
+            "email": "test3@email.com",
+            "password": "pass",
+            "name": 'Fred'
         }
-        create_user(**payload)
         res = self.client.post(CREATE_USER_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         user_exists = get_user_model().objects.filter(
             email=payload['email']
         ).exists()
         self.assertFalse(user_exists)
+
