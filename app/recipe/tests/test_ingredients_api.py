@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from core.models import Ingredient
-from core.serializers import IngredientSerializer
+from recipe.serializers import IngredientSerializer
 
 INGREDIENT_URL = reverse('recipe:ingredient-list')
 
@@ -34,6 +34,7 @@ class TestPublicIngredientAPI(TestCase):
         res = self.client.get(INGREDIENT_URL)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
+
 class TestPrivateIngredientAPI(TestCase):
     """Test the private ingredients api"""
 
@@ -41,3 +42,37 @@ class TestPrivateIngredientAPI(TestCase):
         self.client = APIClient()
         self.user = sample_user()
         self.client.force_authenticate(user=self.user)
+
+    def test_retrieving_ingredient_list(self):
+        """Test retrieving a list of ingredients"""
+        Ingredient.objects.create(user=self.user, name='Kale')
+        Ingredient.objects.create(user=self.user, name='Broccoli')
+
+        res = self.client.get(INGREDIENT_URL)
+
+        ingredients = Ingredient.objects.all()
+        serializer = IngredientSerializer(ingredients, many=True)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, serializer.data)
+
+    def test_ingredients_limited_to_user(self):
+        """Test ingredients only returned for authorized user"""
+        user2 = sample_user(email='other@email.com', name='other')
+        Ingredient.objects.create(user=user2, name='chocolate')
+        ingredient = Ingredient.objects.create(
+            user=self.user,
+            name='strawberry'
+        )
+
+        res = self.client.get(INGREDIENT_URL)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        ingredients = Ingredient.objects.filter(user=self.user)
+        ingredient_exists = Ingredient.objects.filter(
+            name=ingredient.name,
+            user=ingredient.user
+        ).exists()
+        self.assertTrue(ingredient_exists)
+        self.assertEqual(len(ingredients), 1)
