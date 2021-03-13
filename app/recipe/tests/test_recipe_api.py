@@ -1,3 +1,7 @@
+import tempfile
+import os
+
+from PIL import Image
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -9,6 +13,11 @@ from core.models import Recipe, Tag, Ingredient
 from recipe.serializers import RecipeSerializer, RecipeDetailSerializer
 
 RECIPES_URL = reverse('recipe:recipe-list')
+
+
+def recipe_image_upload_url(recipe_id):
+    """Return url for recipe image upload"""
+    return reverse('recipe:recipe-upload-image', args=[recipe_id])
 
 
 def recipe_detail_url(recipe_id):
@@ -193,3 +202,82 @@ class PrivateRecipeTests(TestCase):
         self.assertEqual(payload['time_minutes'], recipe.time_minutes)
         tags = recipe.tags.all()
         self.assertEqual(len(tags), 0)
+
+    def test_filter_recipes_by_tags(self):
+        """Test returning recipes with specific tags"""
+        recipe1 = sample_recipe(user=self.user, title='Thai vegetable curry')
+        recipe2 = sample_recipe(user=self.user, title='Aubergine with tahini')
+        tag1 = sample_tag(user=self.user, name='Vegan')
+        tag2 = sample_tag(user=self.user, name='Vegetarian')
+        recipe1.tags.add(tag1)
+        recipe2.tags.add(tag2)
+        recipe3 = sample_recipe(user=self.user, title='Fish and Chips')
+
+        res = self.client.get(
+            RECIPES_URL,
+            {
+                'tags': f'{tag1.id},{tag2.id}'
+            }
+        )
+        serializer1 = RecipeSerializer(recipe1)
+        serializer2 = RecipeSerializer(recipe2)
+        serializer3 = RecipeSerializer(recipe3)
+        self.assertIn(serializer1.data, res.data)
+        self.assertIn(serializer2.data, res.data)
+        self.assertNotIn(serializer3.data, res.data)
+
+    def test_filter_recipes_by_ingredients(self):
+        """Test returning recipes with specific ingredients"""
+        recipe1 = sample_recipe(user=self.user, title='Posh beans on toast')
+        recipe2 = sample_recipe(user=self.user, title='Chicken cacciatore')
+        ingredient1 = sample_ingredient(user=self.user, name='Feta cheese')
+        ingredient2 = sample_ingredient(user=self.user, name='Chicken')
+        recipe1.ingredients.add(ingredient1)
+        recipe2.ingredients.add(ingredient2)
+        recipe3 = sample_recipe(user=self.user, title='Steak and mushrooms')
+
+        res = self.client.get(
+            RECIPES_URL,
+            {
+                'ingredients': f'{ingredient1.id},{ingredient2.id}'
+            }
+        )
+        serializer1 = RecipeSerializer(recipe1)
+        serializer2 = RecipeSerializer(recipe2)
+        serializer3 = RecipeSerializer(recipe3)
+        self.assertIn(serializer1.data, res.data)
+        self.assertIn(serializer2.data, res.data)
+        self.assertNotIn(serializer3.data, res.data)
+
+
+class RecipeImageUploadTests(TestCase):
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = sample_user()
+        self.client.force_authenticate(user=self.user)
+        self.recipe = sample_recipe(user=self.user)
+
+    def tearDown(self):
+        # Help keep the file system clear from clogging up
+        self.recipe.image.delete()
+
+    def test_upload_image_to_recipe(self):
+        """Test uploading an email to recipe"""
+        url = recipe_image_upload_url(self.recipe.id)
+        with tempfile.NamedTemporaryFile(suffix='.jpg') as ntf:
+            img = Image.new('RGB', (10, 10))
+            img.save(ntf, format='JPEG')
+            # Seek sets the pointer back to the start of the file
+            ntf.seek(0)
+            res = self.client.post(url, {'image': ntf}, format='multipart')
+            self.recipe.refresh_from_db()
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+            self.assertIn('image', res.data)
+            self.assertTrue(os.path.exists(self.recipe.image.path))
+
+    def test_upload_image_bad_request(self):
+        url = recipe_image_upload_url(self.recipe.id)
+        res = self.client.post(url, {'image': 'notimage'}, format='multipart')
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
