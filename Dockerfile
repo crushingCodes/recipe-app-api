@@ -9,7 +9,7 @@ RUN apk add --update --no-cache postgresql-client jpeg-dev
 
 # Temp requirements to build Postgres client
 RUN apk add --update --no-cache --virtual .tmp-build-deps \
-        gcc libc-dev linux-headers postgresql-dev musl-dev zlib zlib-dev
+      gcc libc-dev linux-headers postgresql-dev musl-dev zlib zlib-dev
 
 # Install the requirements
 RUN pip install -r /requirements.txt
