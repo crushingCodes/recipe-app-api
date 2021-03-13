@@ -1,19 +1,27 @@
-# recipe-app-api
+# Recipe App API
+Followed the tutorial [Build a Backend REST API with Python & Django - Advanced](https://www.udemy.com/share/101XNgA0UfeVpUQHQ=/)
 
-##Running
+This is a simple API for managing food recipes. It handles ingredients, tags, and recipe images.
 
-docker-compose up
 
-## Django commands
+***Technologies:***
 
-docker-compose run app sh -c "python manage.py createsuperuser"
+Python, Django, Django Rest Framework, Docker, Travis CI
 
-###Testing credentials
-test@email.com
+## To run it
 
-password
+`docker-compose up
+`
 
-##Testing
+## Development
 
-[comment]: <> (--rm removes after running)
-docker-compose run --rm app sh -c "python manage.py test && flake8"
+### Building
+
+`docker-compose build
+`
+
+### Testing
+
+`docker-compose run --rm app sh -c "python manage.py test && flake8"`
+
+Note: '--rm' causes docker to remove it after running
