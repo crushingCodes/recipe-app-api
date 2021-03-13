@@ -13,7 +13,7 @@ class BaseRecipeAttrViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin
 ):
-    """Base viewset for user recipe attributes"""
+    """Base view set for user recipe attributes"""
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
