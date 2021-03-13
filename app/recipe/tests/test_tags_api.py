@@ -114,7 +114,8 @@ class PrivateAPITagsTest(TestCase):
 
     def test_retrieve_tags_filter_assigned_unique(self):
         """Test filtering tags by assigned returns unique items,
-        using the same tag in different recipes should only return that tag once"""
+        using the same tag in different recipes should only
+        return that tag once"""
         tag = Tag.objects.create(
             user=self.user,
             name='Breakfast'

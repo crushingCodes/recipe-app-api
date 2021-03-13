@@ -97,8 +97,14 @@ class TestPrivateIngredientAPI(TestCase):
 
     def test_retrieve_ingredients_assigned_to_recipes(self):
         """Test filtering ingredients by those assigned to recipes"""
-        ingredient1 = Ingredient.objects.create(user=self.user, name='Broccoli')
-        ingredient2 = Ingredient.objects.create(user=self.user, name='Bread')
+        ingredient1 = Ingredient.objects.create(
+            user=self.user,
+            name='Broccoli'
+        )
+        ingredient2 = Ingredient.objects.create(
+            user=self.user,
+            name='Bread'
+        )
         recipe = Recipe.objects.create(
             user=self.user,
             title='Pasta',
