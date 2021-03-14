@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout, Menu, Breadcrumb } from 'antd';
+import { Layout, Menu, Breadcrumb, PageHeader } from 'antd';
 import {
   DesktopOutlined,
   PieChartOutlined,
@@ -9,6 +9,7 @@ import {
 } from '@ant-design/icons';
 import './Home.css';
 import 'antd/dist/antd.css';
+import RecipeList from './RecipeList';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -46,14 +47,22 @@ export default class Home extends React.Component {
           </Menu>
         </Sider>
         <Layout className="site-layout">
-          <Header className="site-layout-background" style={{ padding: 0 }} />
+          <Header className="site-layout-background" style={{ padding: 0 }} >
+            <h1></h1>
+            <PageHeader
+    className="site-page-header"
+    title="Video Recipes"
+    subTitle="This is a subtitle"
+  />
+          </Header>
           <Content style={{ margin: '0 16px' }}>
             <Breadcrumb style={{ margin: '16px 0' }}>
               <Breadcrumb.Item>Recipes</Breadcrumb.Item>
               <Breadcrumb.Item>Breakfast</Breadcrumb.Item>
             </Breadcrumb>
             <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
-              Recipe List
+              <RecipeList/>
+
             </div>
           </Content>
           <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
