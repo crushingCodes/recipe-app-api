@@ -5,7 +5,7 @@ const data = [
   {
     title: 'English Breakfast',
     content: 'Recipe description',
-      image: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
+      // image: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
   },
   {
     title: 'Japanese Traditional breakfast',
@@ -24,9 +24,8 @@ const data = [
   },
 ];
 
-export default function RecipeList () {
+export default function Recipes () {
     function getImage(item) {
-        let image
         if (item.image){
         return item.image
         }
